@@ -60,7 +60,8 @@ impl BLEWatcher {
         self.watcher
             .SetScanningMode(BluetoothLEScanningMode::Active)
             .unwrap();
-        self.watcher.SetAllowExtendedAdvertisements(true)?;
+        // remove for windows version 1809
+        // self.watcher.SetAllowExtendedAdvertisements(true)?;
         let handler: TypedEventHandler<
             BluetoothLEAdvertisementWatcher,
             BluetoothLEAdvertisementReceivedEventArgs,
