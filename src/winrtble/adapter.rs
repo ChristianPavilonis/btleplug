@@ -58,9 +58,11 @@ impl Central for Adapter {
     async fn start_scan(&self, filter: ScanFilter) -> Result<()> {
         let watcher = self.watcher.lock().unwrap();
         let manager = self.manager.clone();
+        println!("starting watcher");
         watcher.start(
             filter,
             Box::new(move |args| {
+                println!("started watcher");
                 let bluetooth_address = args.BluetoothAddress().unwrap();
                 let address: BDAddr = bluetooth_address.try_into().unwrap();
                 if let Some(mut entry) = manager.peripheral_mut(&address.into()) {

@@ -41,7 +41,10 @@ impl BLEWatcher {
             .unwrap()
             .Advertisement()
             .unwrap();
+        println!("ad: {:?}", ad);
+        
         let ad_services = ad.ServiceUuids().unwrap();
+        println!("services: {:?}", ad_services);
         ad_services.Clear().unwrap();
         for service in services {
             ad_services
