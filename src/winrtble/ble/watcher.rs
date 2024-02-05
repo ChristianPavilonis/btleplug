@@ -22,22 +22,18 @@ pub struct BLEWatcher {
 
 impl From<windows::core::Error> for Error {
     fn from(err: windows::core::Error) -> Error {
-        println!("Error occurred: {:?}", err);
         Error::Other(format!("{:?}", err).into())
     }
 }
 
 impl BLEWatcher {
     pub fn new() -> Self {
-        println!("Creating new BLEWatcher");
         let ad = BluetoothLEAdvertisementFilter::new().unwrap();
         let watcher = BluetoothLEAdvertisementWatcher::Create(&ad).unwrap();
-        println!("BLEWatcher created successfully.");
         BLEWatcher { watcher }
     }
 
     pub fn start(&self, filter: ScanFilter, on_received: AdvertismentEventHandler) -> Result<()> {
-        println!("Starting BLEWatcher");
         let ScanFilter { services } = filter;
         let ad = self
             .watcher
@@ -45,18 +41,15 @@ impl BLEWatcher {
             .unwrap()
             .Advertisement()
             .unwrap();
-        println!("Advertisement: {:?}", ad);
 
         let ad_services = ad.ServiceUuids().unwrap();
-        println!("Existing services: {:?}", ad_services);
         ad_services.Clear().unwrap();
         for service in services {
-            println!("Appending service: {:?}", service);
             ad_services
                 .Append(windows::core::GUID::from(service.as_u128()))
                 .unwrap();
         }
-        println!("Updated services: {:?}", ad_services);
+
         self.watcher
             .SetScanningMode(BluetoothLEScanningMode::Active)
             .unwrap();
@@ -67,7 +60,6 @@ impl BLEWatcher {
             BluetoothLEAdvertisementReceivedEventArgs,
         > = TypedEventHandler::new(
             move |_sender, args: &Option<BluetoothLEAdvertisementReceivedEventArgs>| {
-                println!("Advertisement received");
                 if let Some(args) = args {
                     on_received(args);
                 }
@@ -75,17 +67,13 @@ impl BLEWatcher {
             },
         );
 
-        println!("Setting Received handler");
         self.watcher.Received(&handler)?;
-        println!("Starting Advertisment watcher");
         self.watcher.Start()?;
         Ok(())
     }
 
     pub fn stop(&self) -> Result<()> {
-        println!("Stopping BLEWatcher");
         self.watcher.Stop()?;
-        println!("BLEWatcher stopped.");
         Ok(())
     }
 }
